@@ -1,47 +1,3 @@
-// import React from 'react'
-
-// function Transaction() {
-//   return (
-//         <div className="rounded-3xl bg-white p-6 shadow-sm xl:col-span-1">
-//           <h2 className="mb-6 text-xl font-semibold text-slate-800">
-//             Add New Transaction
-//           </h2>
-
-//           <form className="space-y-4">
-//             <input
-//               type="text"
-//               placeholder="Transaction Title"
-//               className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500"
-//             />
-
-//             <input
-//               type="number"
-//               placeholder="Amount"
-//               className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500"
-//             />
-
-//             <select className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500">
-//               <option>Select Type</option>
-//               <option>Income</option>
-//               <option>Expense</option>
-//             </select>
-
-//             <input
-//               type="date"
-//               className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500"
-//             />
-
-//             <button className="w-full rounded-2xl bg-green-500 py-3 font-semibold text-white transition-all duration-300 hover:bg-green-600">
-//               Add Transaction
-//             </button>
-//           </form>
-//         </div>
-//   )
-// }
-
-// export default Transaction
-
-
 import { useState } from "react";
 
 import {
@@ -50,6 +6,7 @@ import {
   FaTrash,
   FaFilter,
 } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 interface Transaction {
   id: number;
@@ -105,10 +62,24 @@ const transactionData: Transaction[] = [
 
 const Transactions = () => {
   const [search, setSearch] = useState("");
+  const [type,setType] = useState("all")
+  const [category,setCategory] = useState("all")
 
   const filteredTransactions = transactionData.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase())
+    item.title.toLowerCase().includes(search.toLowerCase()) && 
+    (type === "all" || item.type===type) &&
+    (category==="all" || item.category === category)
   );
+
+  const handleType = (e:any)=>{
+    setType(e.target.value)
+    
+
+  }
+
+  const handleCategory = (e:any) =>{
+    setCategory(e.target.value)
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
@@ -124,9 +95,9 @@ const Transactions = () => {
           </p>
         </div>
 
-        <button className="rounded-2xl bg-green-500 px-5 py-3 font-semibold text-white shadow-sm transition-all duration-300 hover:bg-green-600">
+        <Link to="/add-transaction" className="rounded-2xl bg-green-500 px-5 py-3 font-semibold text-white shadow-sm transition-all duration-300 hover:bg-green-600">
           + Add Transaction
-        </button>
+        </Link>
       </div>
 
       {/* Filters */}
@@ -146,19 +117,19 @@ const Transactions = () => {
           </div>
 
           {/* Type Filter */}
-          <select className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500">
-            <option>All Types</option>
-            <option>Income</option>
-            <option>Expense</option>
+          <select className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500" onChange={handleType}>
+            <option value="all">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
           </select>
 
           {/* Category Filter */}
-          <select className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500">
-            <option>All Categories</option>
-            <option>Food</option>
-            <option>Travel</option>
-            <option>Shopping</option>
-            <option>Work</option>
+          <select className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500" onChange={handleCategory}>
+            <option value={"all"}>All Categories</option>
+            <option value={"Food"}>Food</option>
+            <option value={"Travel"}>Travel</option>
+            <option value={"Shopping"}>Shopping</option>
+            <option value={"Work"}>Work</option>
           </select>
         </div>
 

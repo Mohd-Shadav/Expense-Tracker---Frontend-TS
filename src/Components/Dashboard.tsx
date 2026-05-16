@@ -9,6 +9,7 @@ import {
   FaPen,
   FaTrash,
 } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 import {
   PieChart,
@@ -184,9 +185,9 @@ const Dashboard = () => {
               Recent Transactions
             </h2>
 
-            <button className="text-sm font-medium text-green-600">
+            <Link to="/transactions" className="text-sm font-medium text-green-600">
               View All
-            </button>
+            </Link>
           </div>
 
           <div className="overflow-x-auto">
