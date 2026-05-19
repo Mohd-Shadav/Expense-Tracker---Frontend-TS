@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 import {
   FaArrowTrendUp,
@@ -7,9 +7,85 @@ import {
   FaCalendarDays,
   FaFileLines,
 } from "react-icons/fa6";
+interface Form {
+     title:string,
+    amount:number,
+    type:"income"|"expense",
+    category:string,
+    date:string,
+    notes:string
+}
 
 const AddTransaction = () => {
   const [type, setType] = useState<"income" | "expense">("income");
+  const [formData,setFormData] = useState<Form>({
+    title:"",
+    amount:0,
+    type:"expense",
+    category:"",
+    date:"",
+    notes:""
+
+  })
+
+  const handleSubmit = (e:React.SubmitEvent<HTMLFormElement>)=>{
+    e.preventDefault();
+    console.log(formData)
+
+  }
+
+
+  const handleChange = (e:React.ChangeEvent< HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>)=>{
+    let {name,value} = e.target;
+
+    if(name==="title"){
+      setFormData((prev)=>({
+        ...prev,
+        [name]:value
+      }))
+      return;
+    }
+      if(name==="amount"){
+      setFormData((prev)=>({
+        ...prev,
+        [name]:value
+      }))
+      return;
+    }
+      if(name==="type"){
+      setFormData((prev)=>({
+        ...prev,
+        type:type
+      }))
+      return;
+    }
+      if(name==="category"){
+      setFormData((prev)=>({
+        ...prev,
+        [name]:value
+      }))
+      return;
+    }
+      if(name==="date"){
+      setFormData((prev)=>({
+        ...prev,
+        [name]:value
+      }))
+      return;
+    }
+      if(name==="notes"){
+      setFormData((prev)=>({
+        ...prev,
+        [name]:value
+      }))
+      return;
+    }
+   
+
+
+
+
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
@@ -32,7 +108,7 @@ const AddTransaction = () => {
             Transaction Details
           </h2>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Title */}
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600">
@@ -41,9 +117,11 @@ const AddTransaction = () => {
 
               <input
                 type="text"
+                value={formData.title}
+                name="title"
                 placeholder="Enter transaction title"
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition-all duration-300 focus:border-green-500"
-              />
+                 onChange={handleChange}/>
             </div>
 
             {/* Amount */}
@@ -58,8 +136,11 @@ const AddTransaction = () => {
                 <input
                   type="number"
                   placeholder="Enter amount"
+                  value={formData.amount}
+                  name="amount"
+
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 outline-none transition-all duration-300 focus:border-green-500"
-                />
+                  onChange={handleChange}/>
               </div>
             </div>
 
@@ -104,13 +185,13 @@ const AddTransaction = () => {
                 Category
               </label>
 
-              <select className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition-all duration-300 focus:border-green-500">
-                <option>Select Category</option>
-                <option>Food</option>
-                <option>Travel</option>
-                <option>Shopping</option>
-                <option>Salary</option>
-                <option>Freelance</option>
+              <select value={formData.category} name="category" className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition-all duration-300 focus:border-green-500" onChange={handleChange}>
+                <option disabled>Select Category</option>
+                <option value={"Food"}>Food</option>
+                <option value={"Travel"}>Travel</option>
+                <option value={"Shopping"}>Shopping</option>
+                <option value={"Salary"}>Salary</option>
+                <option value={"Freelance"}>Freelance</option>
               </select>
             </div>
 
@@ -125,8 +206,10 @@ const AddTransaction = () => {
 
                 <input
                   type="date"
+                  name={"date"}
+                  value={formData.date}
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 outline-none transition-all duration-300 focus:border-green-500"
-                />
+                onChange={handleChange}/>
               </div>
             </div>
 
@@ -141,9 +224,11 @@ const AddTransaction = () => {
 
                 <textarea
                   rows={5}
+                  name={"notes"}
+                  value={formData.notes}
                   placeholder="Write transaction notes..."
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 outline-none transition-all duration-300 focus:border-green-500"
-                ></textarea>
+                onChange={handleChange}></textarea>
               </div>
             </div>
 

@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import {
   FaChartPie,
@@ -10,8 +10,19 @@ import {
   FaWallet,
   FaArrowRightFromBracket,
 } from "react-icons/fa6";
+import axios from "axios";
+import { useEffect, useState } from "react";
+interface USER {
+  _id:string,
+  name:string,
+  email:string,
+  createdAt: string;
+  updatedAt: string;
+}
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const [user,setUser] = useState<USER|null>(null)
   const navItems = [
     {
       title: "Dashboard",
@@ -44,6 +55,47 @@ const Sidebar = () => {
       icon: <FaGear />,
     },
   ];
+
+   useEffect(()=>{
+    async function authentication(){
+
+      let res = await axios.get('http://localhost:3000/user/auth',{
+        withCredentials:true
+      });
+
+      if(!res){
+        alert("Please Login")
+        return;
+      }
+
+     setUser(res.data)
+
+    }
+    authentication();
+
+  },[])
+
+ const handleLogout = async () => {
+
+   try {
+
+      await axios.get(
+         "http://localhost:3000/user/logout",
+         {
+            withCredentials:true
+         }
+      );
+
+
+    
+      navigate("/login");
+
+   } catch (error) {
+
+      alert(error);
+
+   }
+};
 
   return (
     <div className="sticky top-0 flex h-screen w-[290px] flex-col justify-between border-r border-slate-200 bg-white p-6 shadow-sm">
@@ -114,17 +166,17 @@ const Sidebar = () => {
 
           <div>
             <h3 className="font-semibold text-slate-800">
-              Mohd Shadav
+             {user?.name}
             </h3>
 
-            <p className="text-sm text-slate-500">
-              Premium User
+            <p className="text-sm text-slate-500 break-all">
+             {user?.email}
             </p>
           </div>
         </div>
 
         {/* Logout */}
-        <button className="flex w-full items-center justify-center gap-3 rounded-2xl bg-red-500 py-4 font-semibold text-white transition-all duration-300 hover:bg-red-600">
+        <button className="flex w-full items-center justify-center gap-3 rounded-2xl cursor-pointer bg-red-500 py-4 font-semibold text-white transition-all duration-300 hover:bg-red-700" onClick={handleLogout}>
           <FaArrowRightFromBracket />
           Logout
         </button>

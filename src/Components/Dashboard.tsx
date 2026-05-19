@@ -1,5 +1,7 @@
 
 
+import axios from "axios";
+import { useEffect, useState } from "react";
 import {
   FaArrowTrendUp,
   FaArrowTrendDown,
@@ -78,6 +80,26 @@ const categoryData = [
 const COLORS = ["#22c55e", "#ef4444", "#3b82f6"];
 
 const Dashboard = () => {
+  const [user,setUser] = useState({})
+
+  useEffect(()=>{
+    async function authentication(){
+
+      let res = await axios.get('http://localhost:3000/user/auth',{
+        withCredentials:true
+      });
+
+      if(!res){
+        alert("Please Login")
+        return;
+      }
+
+     setUser(res.data)
+
+    }
+    authentication();
+
+  },[])
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
       {/* Topbar */}
