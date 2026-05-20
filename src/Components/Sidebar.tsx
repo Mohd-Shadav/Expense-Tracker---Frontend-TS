@@ -44,6 +44,11 @@ const Sidebar = () => {
       path: "/categories",
       icon: <FaLayerGroup />,
     },
+     {
+      title: "Add Category",
+      path: "/add-category",
+      icon: <FaLayerGroup />,
+    },
     {
       title: "Reports",
       path: "/reports",

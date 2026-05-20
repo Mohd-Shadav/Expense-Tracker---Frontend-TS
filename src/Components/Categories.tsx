@@ -10,6 +10,7 @@ import {
   FaTrash,
   FaPlus,
 } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 interface Category {
   id: number;
@@ -74,10 +75,10 @@ const Categories = () => {
           </p>
         </div>
 
-        <button className="flex items-center gap-2 rounded-2xl bg-green-500 px-5 py-3 font-semibold text-white shadow-sm transition-all duration-300 hover:bg-green-600">
+        <Link to={'/add-category'} className="flex items-center gap-2 rounded-2xl bg-green-500 px-5 py-3 font-semibold text-white shadow-sm transition-all duration-300 hover:bg-green-600">
           <FaPlus />
           Add Category
-        </button>
+        </Link>
       </div>
 
       {/* Category Stats */}

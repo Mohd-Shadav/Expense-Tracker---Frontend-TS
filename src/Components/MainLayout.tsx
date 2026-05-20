@@ -6,6 +6,7 @@ import Reports from "./Reports";
 import Settings from "./Settings";
 import Transactions from "./Transaction";
 import Sidebar from "./Sidebar";
+import AddCategory from "./AddCategory";
 
 
 function MainLayout(){
@@ -18,6 +19,7 @@ function MainLayout(){
         <Route path="/transactions" element={<Transactions/>}/>
         <Route path="/add-transaction" element={<AddTransaction/>}/>
         <Route path="/categories" element={<Categories/>}/>
+        <Route path="/add-category" element={<AddCategory/>}/>
         <Route path="/reports" element={<Reports/>}/>
         <Route path="/settings" element={<Settings/>}/>
         </Routes>

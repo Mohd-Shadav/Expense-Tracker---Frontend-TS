@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 
 import {
@@ -12,6 +13,7 @@ interface Form {
     amount:number,
     type:"income"|"expense",
     category:string,
+    paymentMethod:"cash"|"upi"|"bank"|"card",
     date:string,
     notes:string
 }
@@ -23,20 +25,53 @@ const AddTransaction = () => {
     amount:0,
     type:"expense",
     category:"",
+    paymentMethod:"cash",
     date:"",
     notes:""
 
   })
 
-  const handleSubmit = (e:React.SubmitEvent<HTMLFormElement>)=>{
+  const handleSubmit =async (e:React.SubmitEvent<HTMLFormElement>)=>{
     e.preventDefault();
-    console.log(formData)
+    try{
+
+      let res = await axios.post("http://localhost:3000/transaction/addtransaction",formData,{
+        withCredentials:true,
+        headers:{
+          "Content-Type":"Application/json"
+
+        }
+      })
+
+    
+
+     if(res.status===200){
+      alert("Your Expense Has been Added Successfully.")
+      setFormData({
+    title:"",
+    amount:0,
+    type:"expense",
+    category:"",
+    paymentMethod:"cash",
+    date:"",
+    notes:""
+
+  })
+      return;
+     }
+
+
+    }catch(err){
+      alert("Something went Wrong")
+      return;
+    }
 
   }
 
 
   const handleChange = (e:React.ChangeEvent< HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>)=>{
     let {name,value} = e.target;
+    console.log(name,typeof value)
 
     if(name==="title"){
       setFormData((prev)=>({
@@ -46,9 +81,10 @@ const AddTransaction = () => {
       return;
     }
       if(name==="amount"){
+        let dummy = Number(value)
       setFormData((prev)=>({
         ...prev,
-        [name]:value
+        [name]:dummy
       }))
       return;
     }
@@ -63,6 +99,15 @@ const AddTransaction = () => {
       setFormData((prev)=>({
         ...prev,
         [name]:value
+      }))
+      return;
+    }
+
+     if(name==="paymentMethod"){
+      
+      setFormData((prev)=>({
+        ...prev,
+        [name]:value as "cash"|"upi"|"bank"|"card" 
       }))
       return;
     }
@@ -121,7 +166,7 @@ const AddTransaction = () => {
                 name="title"
                 placeholder="Enter transaction title"
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition-all duration-300 focus:border-green-500"
-                 onChange={handleChange}/>
+                 onChange={handleChange} required/>
             </div>
 
             {/* Amount */}
@@ -136,11 +181,11 @@ const AddTransaction = () => {
                 <input
                   type="number"
                   placeholder="Enter amount"
-                  value={formData.amount}
+                  value={formData.amount === 0 ? "" : formData.amount}
                   name="amount"
 
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 outline-none transition-all duration-300 focus:border-green-500"
-                  onChange={handleChange}/>
+                  onChange={handleChange} required/>
               </div>
             </div>
 
@@ -187,11 +232,27 @@ const AddTransaction = () => {
 
               <select value={formData.category} name="category" className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition-all duration-300 focus:border-green-500" onChange={handleChange}>
                 <option disabled>Select Category</option>
-                <option value={"Food"}>Food</option>
+                <option selected value={"Food"}>Food</option>
                 <option value={"Travel"}>Travel</option>
                 <option value={"Shopping"}>Shopping</option>
                 <option value={"Salary"}>Salary</option>
                 <option value={"Freelance"}>Freelance</option>
+              </select>
+            </div>
+
+            {/* Payment Method */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-600">
+                Payment Method
+              </label>
+
+              <select value={formData.paymentMethod} name="paymentMethod" className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition-all duration-300 focus:border-green-500" onChange={handleChange}>
+                <option disabled>Select Payment Method</option>
+                <option value={"cash"}>Cash</option>
+                <option value={"upi"}>UPI</option>
+                <option value={"bank"}>Bank</option>
+                <option value={"card"}>Card</option>
+                
               </select>
             </div>
 
@@ -209,7 +270,7 @@ const AddTransaction = () => {
                   name={"date"}
                   value={formData.date}
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 outline-none transition-all duration-300 focus:border-green-500"
-                onChange={handleChange}/>
+                onChange={handleChange} required/>
               </div>
             </div>
 

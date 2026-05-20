@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 import {
   FaMagnifyingGlass,
@@ -11,64 +12,24 @@ import { Link } from "react-router-dom";
 interface Transaction {
   id: number;
   title: string;
-  category: string;
+  category: {name:string,color:string};
   type: "income" | "expense";
   amount: number;
   date: string;
 }
 
-const transactionData: Transaction[] = [
-  {
-    id: 1,
-    title: "Salary",
-    category: "Job",
-    type: "income",
-    amount: 5000,
-    date: "12 May 2026",
-  },
-  {
-    id: 2,
-    title: "Shopping",
-    category: "Lifestyle",
-    type: "expense",
-    amount: 1200,
-    date: "13 May 2026",
-  },
-  {
-    id: 3,
-    title: "Freelance",
-    category: "Work",
-    type: "income",
-    amount: 2500,
-    date: "14 May 2026",
-  },
-  {
-    id: 4,
-    title: "Food",
-    category: "Food",
-    type: "expense",
-    amount: 800,
-    date: "15 May 2026",
-  },
-  {
-    id: 5,
-    title: "Travel",
-    category: "Travel",
-    type: "expense",
-    amount: 1500,
-    date: "16 May 2026",
-  },
-];
+
 
 const Transactions = () => {
   const [search, setSearch] = useState("");
   const [type,setType] = useState("all")
   const [category,setCategory] = useState("all")
+  const [transactionData,setTransactiondata] = useState<Transaction[]>([])
 
   const filteredTransactions = transactionData.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase()) && 
-    (type === "all" || item.type===type) &&
-    (category==="all" || item.category === category)
+    item?.title?.toLowerCase().includes(search.toLowerCase()) && 
+    (type === "all" || item?.type===type) &&
+    (category==="all" || item?.category?.name === category)
   );
 
   const handleType = (e:any)=>{
@@ -81,6 +42,26 @@ const Transactions = () => {
     setCategory(e.target.value)
   }
 
+
+
+  useEffect(()=>{
+    async function getTransactions(){
+      try{
+        let res = await axios.get("http://localhost:3000/transaction/gettransactions",{
+          withCredentials:true
+        })
+       if(res.status===200){
+        console.log(res.data)
+        setTransactiondata(res.data)
+       }
+
+      }catch(Err){
+        alert(Err)
+      }
+
+    }
+    getTransactions()
+  },[])
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
       {/* Header */}
@@ -158,7 +139,7 @@ const Transactions = () => {
             </thead>
 
             <tbody>
-              {filteredTransactions.map((item) => (
+              {filteredTransactions.map((item:any) => (
                 <tr
                   key={item.id}
                   className="border-b border-slate-100 transition-all duration-300 hover:bg-slate-50"
@@ -170,14 +151,16 @@ const Transactions = () => {
                       </h3>
 
                       <p className="mt-1 text-sm text-slate-400">
-                        Transaction ID #{item.id}
+                        Transaction ID #{item._id}
                       </p>
                     </div>
                   </td>
 
                   <td className="px-6 py-5">
-                    <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
-                      {item.category}
+                    <span style={{
+    backgroundColor: item?.category?.color
+  }} className={`rounded-full px-4 py-2 text-sm font-medium text-slate-600`}>
+                      {item?.category?.name}
                     </span>
                   </td>
 
@@ -204,7 +187,7 @@ const Transactions = () => {
                   </td>
 
                   <td className="px-6 py-5 text-slate-500">
-                    {item.date}
+                    {item?.date?.split("T")[0]}
                   </td>
 
                   <td className="px-6 py-5">

@@ -1,15 +1,75 @@
-import { useState } from "react";
+import axios from "axios";
+import React, { useState } from "react";
 
 import {
   FaLayerGroup,
   FaArrowTrendUp,
   FaArrowTrendDown,
-  FaFileLines,
+  FaPalette,
   FaIcons,
 } from "react-icons/fa6";
 
 const AddCategory = () => {
-  const [type, setType] = useState<"income" | "expense">("expense");
+  const [type, setType] = useState<"income" | "expense">(
+    "expense"
+  );
+
+  const [formData, setFormData] = useState({
+    name: "",
+    type: "expense",
+    color: "#22c55e",
+    icon: "💰",
+  });
+
+  const icons = [
+    "💰",
+    "🍔",
+    "✈️",
+    "🛍️",
+    "🎮",
+    "🏠",
+    "🚗",
+    "📚",
+    "💻",
+    "❤️",
+  ];
+
+  const colors = [
+    "#22c55e",
+    "#ef4444",
+    "#3b82f6",
+    "#f97316",
+    "#8b5cf6",
+    "#ec4899",
+    "#14b8a6",
+    "#eab308",
+  ];
+
+  const handleSubmit = async (e:React.SubmitEvent<HTMLFormElement>)=>{
+    e.preventDefault();
+    try{
+      let res = await axios.post("http://localhost:3000/category/addcategory",formData,{
+        withCredentials:true,
+        headers:{
+          "Content-Type":"Application/json"
+        }
+      })
+
+      if(res.status===200){
+        alert("Category Has been Created Successfully")
+        setFormData({
+            name: "",
+    type: "expense",
+    color: "#22c55e",
+    icon: "💰",
+        })
+      }
+
+    }catch(err){
+      alert(err)
+    }
+
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
@@ -20,11 +80,12 @@ const AddCategory = () => {
         </h1>
 
         <p className="mt-2 text-sm text-slate-500">
-          Create and organize categories for better expense tracking.
+          Create categories for organizing your expenses and
+          income.
         </p>
       </div>
 
-      {/* Main Layout */}
+      {/* Layout */}
       <div className="grid gap-6 xl:grid-cols-3">
         {/* Form */}
         <div className="rounded-3xl bg-white p-6 shadow-sm xl:col-span-2">
@@ -32,8 +93,8 @@ const AddCategory = () => {
             Category Details
           </h2>
 
-          <form className="space-y-5">
-            {/* Category Name */}
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Name */}
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Category Name
@@ -45,12 +106,19 @@ const AddCategory = () => {
                 <input
                   type="text"
                   placeholder="Enter category name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      name: e.target.value,
+                    })
+                  }
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 outline-none transition-all duration-300 focus:border-green-500"
                 />
               </div>
             </div>
 
-            {/* Category Type */}
+            {/* Type */}
             <div>
               <label className="mb-3 block text-sm font-medium text-slate-600">
                 Category Type
@@ -59,7 +127,14 @@ const AddCategory = () => {
               <div className="flex gap-4">
                 <button
                   type="button"
-                  onClick={() => setType("income")}
+                  onClick={() => {
+                    setType("income");
+
+                    setFormData({
+                      ...formData,
+                      type: "income",
+                    });
+                  }}
                   className={`flex flex-1 items-center justify-center gap-2 rounded-2xl py-4 font-semibold transition-all duration-300 ${
                     type === "income"
                       ? "bg-green-500 text-white"
@@ -72,7 +147,14 @@ const AddCategory = () => {
 
                 <button
                   type="button"
-                  onClick={() => setType("expense")}
+                  onClick={() => {
+                    setType("expense");
+
+                    setFormData({
+                      ...formData,
+                      type: "expense",
+                    });
+                  }}
                   className={`flex flex-1 items-center justify-center gap-2 rounded-2xl py-4 font-semibold transition-all duration-300 ${
                     type === "expense"
                       ? "bg-red-500 text-white"
@@ -85,40 +167,64 @@ const AddCategory = () => {
               </div>
             </div>
 
-            {/* Icon */}
+            {/* Color Picker */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-600">
-                Select Icon
+              <label className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-600">
+                <FaPalette />
+                Select Color
               </label>
 
-              <div className="relative">
-                <FaIcons className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-
-                <select className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 outline-none transition-all duration-300 focus:border-green-500">
-                  <option>Select Icon</option>
-                  <option>Food</option>
-                  <option>Travel</option>
-                  <option>Shopping</option>
-                  <option>Salary</option>
-                  <option>Freelance</option>
-                </select>
+              <div className="flex flex-wrap gap-4">
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        color,
+                      })
+                    }
+                    className={`h-12 w-12 rounded-2xl border-4 transition-all duration-300 ${
+                      formData.color === color
+                        ? "border-slate-800 scale-110"
+                        : "border-transparent"
+                    }`}
+                    style={{
+                      backgroundColor: color,
+                    }}
+                  ></button>
+                ))}
               </div>
             </div>
 
-            {/* Description */}
+            {/* Icon Picker */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-600">
-                Description
+              <label className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-600">
+                <FaIcons />
+                Select Icon
               </label>
 
-              <div className="relative">
-                <FaFileLines className="absolute left-4 top-5 text-slate-400" />
-
-                <textarea
-                  rows={5}
-                  placeholder="Write category description..."
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 outline-none transition-all duration-300 focus:border-green-500"
-                ></textarea>
+              <div className="grid grid-cols-5 gap-4">
+                {icons.map((icon) => (
+                  <button
+                    key={icon}
+                    type="button"
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        icon,
+                      })
+                    }
+                    className={`flex h-16 items-center justify-center rounded-2xl border text-2xl transition-all duration-300 ${
+                      formData.icon === icon
+                        ? "border-green-500 bg-green-50"
+                        : "border-slate-200 bg-slate-50 hover:bg-slate-100"
+                    }`}
+                  >
+                    {icon}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -145,38 +251,31 @@ const AddCategory = () => {
           </form>
         </div>
 
-        {/* Preview Card */}
+        {/* Preview */}
         <div className="rounded-3xl bg-white p-6 shadow-sm">
           <h2 className="mb-6 text-2xl font-semibold text-slate-800">
             Live Preview
           </h2>
 
           <div
-            className={`rounded-3xl p-6 text-white shadow-lg transition-all duration-300 ${
-              type === "income"
-                ? "bg-gradient-to-br from-green-500 to-emerald-600"
-                : "bg-gradient-to-br from-red-500 to-rose-600"
-            }`}
+            className="rounded-3xl p-6 text-white shadow-lg"
+            style={{
+              background: `linear-gradient(135deg, ${formData.color}, ${formData.color}dd)`,
+            }}
           >
             <div className="mb-8 flex items-center justify-between">
               <div>
                 <p className="text-sm opacity-80">
-                  {type === "income"
-                    ? "Income Category"
-                    : "Expense Category"}
+                  {formData.type}
                 </p>
 
                 <h1 className="mt-2 text-3xl font-bold">
-                  New Category
+                  {formData.name || "Category"}
                 </h1>
               </div>
 
-              <div className="rounded-2xl bg-white/20 p-4 backdrop-blur-sm">
-                {type === "income" ? (
-                  <FaArrowTrendUp size={24} />
-                ) : (
-                  <FaArrowTrendDown size={24} />
-                )}
+              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/20 text-4xl backdrop-blur-sm">
+                {formData.icon}
               </div>
             </div>
 
@@ -196,24 +295,24 @@ const AddCategory = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="opacity-80">Visibility</span>
+                <span className="opacity-80">Created</span>
 
-                <span>Public</span>
+                <span>Today</span>
               </div>
             </div>
           </div>
 
-          {/* Info Box */}
+          {/* Preview Info */}
           <div className="mt-6 rounded-3xl bg-slate-50 p-5">
             <h3 className="mb-3 font-semibold text-slate-700">
-              Category Tips
+              Category Info
             </h3>
 
             <ul className="space-y-2 text-sm text-slate-500">
-              <li>• Keep category names simple</li>
-              <li>• Use clear descriptions</li>
-              <li>• Separate income & expenses</li>
-              <li>• Avoid duplicate categories</li>
+              <li>• Use meaningful category names</li>
+              <li>• Choose visually distinct colors</li>
+              <li>• Icons improve readability</li>
+              <li>• Separate income & expense types</li>
             </ul>
           </div>
         </div>
