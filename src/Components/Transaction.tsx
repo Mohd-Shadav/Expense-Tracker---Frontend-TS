@@ -26,7 +26,7 @@ const Transactions = () => {
   const [category,setCategory] = useState("all")
   const [transactionData,setTransactiondata] = useState<Transaction[]>([])
 
-  const filteredTransactions = transactionData.filter((item) =>
+  const filteredTransactions = transactionData?.filter((item) =>
     item?.title?.toLowerCase().includes(search.toLowerCase()) && 
     (type === "all" || item?.type===type) &&
     (category==="all" || item?.category?.name === category)
@@ -51,7 +51,7 @@ const Transactions = () => {
           withCredentials:true
         })
        if(res.status===200){
-        console.log(res.data)
+       
         setTransactiondata(res.data)
        }
 
@@ -141,13 +141,13 @@ const Transactions = () => {
             <tbody>
               {filteredTransactions.map((item:any) => (
                 <tr
-                  key={item.id}
+                  key={item?.id}
                   className="border-b border-slate-100 transition-all duration-300 hover:bg-slate-50"
                 >
                   <td className="px-6 py-5">
                     <div>
                       <h3 className="font-semibold text-slate-700">
-                        {item.title}
+                        {item?.title}
                       </h3>
 
                       <p className="mt-1 text-sm text-slate-400">
@@ -167,12 +167,12 @@ const Transactions = () => {
                   <td className="px-6 py-5">
                     <span
                       className={`rounded-full px-4 py-2 text-xs font-semibold ${
-                        item.type === "income"
+                        item?.type === "income"
                           ? "bg-green-100 text-green-600"
                           : "bg-red-100 text-red-500"
                       }`}
                     >
-                      {item.type}
+                      {item?.type}
                     </span>
                   </td>
 

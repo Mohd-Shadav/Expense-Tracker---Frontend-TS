@@ -65,8 +65,9 @@ const AddCategory = () => {
         })
       }
 
-    }catch(err){
-      alert(err)
+    }catch(err:any){
+    
+       alert(err.response.data.message)
     }
 
   }
