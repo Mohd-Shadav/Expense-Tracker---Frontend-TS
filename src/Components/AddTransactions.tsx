@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   FaArrowTrendUp,
@@ -18,15 +18,24 @@ interface Form {
     notes:string
 }
 
+interface Category {
+  name:string,
+  user:string,
+  type:string,
+  color:string,
+  icon:string
+}
+
 const AddTransaction = () => {
-  const [type, setType] = useState<"income" | "expense">("income");
+  const [type, setType] = useState<"income" | "expense">("expense");
+  const [categories,setCategories] = useState<Category[]>([])
   const [formData,setFormData] = useState<Form>({
     title:"",
     amount:0,
     type:"expense",
     category:"",
     paymentMethod:"cash",
-    date:"",
+    date:new Date().toISOString().split("T")[0],
     notes:""
 
   })
@@ -34,6 +43,30 @@ const AddTransaction = () => {
   const handleSubmit =async (e:React.SubmitEvent<HTMLFormElement>)=>{
     e.preventDefault();
     try{
+      const selectedDate = new Date(formData.date);
+  const today = new Date();
+
+  // Invalid date check
+  if (isNaN(selectedDate.getTime())) {
+    alert("Please enter a valid date");
+    return;
+  }
+
+  // Future date check
+  if (selectedDate > today) {
+    alert("Future dates are not allowed");
+    return;
+  }
+
+  // Year validation
+  const year = selectedDate.getFullYear();
+
+  if (year < 2000 || year > today.getFullYear()) {
+    alert("Please enter a valid year");
+    return;
+  }
+
+     
 
       let res = await axios.post("http://localhost:3000/transaction/addtransaction",formData,{
         withCredentials:true,
@@ -42,6 +75,8 @@ const AddTransaction = () => {
 
         }
       })
+
+     
 
     
 
@@ -53,7 +88,7 @@ const AddTransaction = () => {
     type:"expense",
     category:"",
     paymentMethod:"cash",
-    date:"",
+    date:new Date().toISOString().split("T")[0],
     notes:""
 
   })
@@ -71,7 +106,12 @@ const AddTransaction = () => {
 
   const handleChange = (e:React.ChangeEvent< HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>)=>{
     let {name,value} = e.target;
-    console.log(name,typeof value)
+
+     setFormData((prev)=>({
+        ...prev,
+        type:type
+      }))
+   
 
     if(name==="title"){
       setFormData((prev)=>({
@@ -131,6 +171,20 @@ const AddTransaction = () => {
 
 
   }
+
+
+  useEffect(()=>{
+    async function getCategories(){
+      let res = await axios.get("http://localhost:3000/category/getcategories",{
+        withCredentials:true
+      })
+      setCategories(res.data)
+    } 
+
+   
+    getCategories();
+
+  },[])
 
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
@@ -230,13 +284,15 @@ const AddTransaction = () => {
                 Category
               </label>
 
-              <select value={formData.category} name="category" className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition-all duration-300 focus:border-green-500" onChange={handleChange}>
-                <option disabled>Select Category</option>
-                <option selected value={"Food"}>Food</option>
-                <option value={"Travel"}>Travel</option>
-                <option value={"Shopping"}>Shopping</option>
-                <option value={"Salary"}>Salary</option>
-                <option value={"Freelance"}>Freelance</option>
+              <select value={formData.category} name="category" className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition-all duration-300 focus:border-green-500" onChange={handleChange}required>
+                <option disabled selected value={""}>Select Category</option>
+                {categories.length>0 ? (
+                  categories.map((item)=>{
+                    return <option value={item?.name}>{item.name}</option>
+                  })
+                ):(
+                  <option disabled>No Category Added Yet</option>
+                )}
               </select>
             </div>
 

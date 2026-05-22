@@ -7,15 +7,23 @@ import {
   FaTrash,
   FaFilter,
 } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
 
 interface Transaction {
-  id: number;
+   _id:string
   title: string;
   category: {name:string,color:string};
   type: "income" | "expense";
   amount: number;
   date: string;
+}
+
+interface Category {
+  name:string,
+  user:string,
+  type:string,
+  color:string,
+  icon:string
 }
 
 
@@ -24,7 +32,9 @@ const Transactions = () => {
   const [search, setSearch] = useState("");
   const [type,setType] = useState("all")
   const [category,setCategory] = useState("all")
+  const [categories,setCategories] = useState<Category[]>([])
   const [transactionData,setTransactiondata] = useState<Transaction[]>([])
+ 
 
   const filteredTransactions = transactionData?.filter((item) =>
     item?.title?.toLowerCase().includes(search.toLowerCase()) && 
@@ -43,6 +53,31 @@ const Transactions = () => {
   }
 
 
+  const deleteTransaction =async (id:string)=>{
+    
+    try{
+      let res = await axios.delete("http://localhost:3000/transaction/deleteTransaction",{
+        data:{id},
+        withCredentials:true
+      })
+
+      if(res.status===200){
+        alert("Transaction Deleted Successfully")
+         setTransactiondata((prev) =>
+        prev.filter((item) => item._id !== id)
+      );
+        
+        
+      }
+
+
+    }catch(err){
+      alert(err)
+    }
+
+  }
+
+
 
   useEffect(()=>{
     async function getTransactions(){
@@ -51,8 +86,9 @@ const Transactions = () => {
           withCredentials:true
         })
        if(res.status===200){
+        
        
-        setTransactiondata(res.data)
+        setTransactiondata(res.data || [])
        }
 
       }catch(Err){
@@ -61,7 +97,19 @@ const Transactions = () => {
 
     }
     getTransactions()
+
+     async function getCategories(){
+      let res = await axios.get("http://localhost:3000/category/getcategories",{
+        withCredentials:true
+      })
+      setCategories(res.data)
+    } 
+
+   
+    getCategories();
   },[])
+
+  
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
       {/* Header */}
@@ -107,10 +155,13 @@ const Transactions = () => {
           {/* Category Filter */}
           <select className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition-all focus:border-green-500" onChange={handleCategory}>
             <option value={"all"}>All Categories</option>
-            <option value={"Food"}>Food</option>
-            <option value={"Travel"}>Travel</option>
-            <option value={"Shopping"}>Shopping</option>
-            <option value={"Work"}>Work</option>
+            {categories.length>0 ?(categories.map((item)=>{
+              return (
+                <option value={item?.name}>{item?.name}</option>
+              )
+            })):(
+              <option disabled>No Category Yet</option>
+            )}
           </select>
         </div>
 
@@ -139,9 +190,11 @@ const Transactions = () => {
             </thead>
 
             <tbody>
-              {filteredTransactions.map((item:any) => (
+              {filteredTransactions.length>0 ? (
+              
+              filteredTransactions.map((item:any) => (
                 <tr
-                  key={item?.id}
+                  key={item?._id}
                   className="border-b border-slate-100 transition-all duration-300 hover:bg-slate-50"
                 >
                   <td className="px-6 py-5">
@@ -151,7 +204,7 @@ const Transactions = () => {
                       </h3>
 
                       <p className="mt-1 text-sm text-slate-400">
-                        Transaction ID #{item._id}
+                        Transaction ID #{item?._id}
                       </p>
                     </div>
                   </td>
@@ -159,7 +212,7 @@ const Transactions = () => {
                   <td className="px-6 py-5">
                     <span style={{
     backgroundColor: item?.category?.color
-  }} className={`rounded-full px-4 py-2 text-sm font-medium text-slate-600`}>
+  }} className={`rounded-full px-4 py-2 text-sm font-medium text-white`}>
                       {item?.category?.name}
                     </span>
                   </td>
@@ -196,13 +249,22 @@ const Transactions = () => {
                         <FaPen size={14} />
                       </button>
 
-                      <button className="rounded-xl bg-red-100 p-3 text-red-500 transition-all duration-300 hover:bg-red-200">
+                      <button className="rounded-xl bg-red-100 p-3 text-red-500 transition-all duration-300 hover:bg-red-200" onClick={()=>deleteTransaction(item?._id)}>
                         <FaTrash size={14} />
                       </button>
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))):(
+                  <tr>
+      <td
+        colSpan={6}
+        className="py-10 text-center text-lg font-medium text-slate-400"
+      >
+        No Transactions Yet
+      </td>
+    </tr>
+              )}
             </tbody>
           </table>
         </div>

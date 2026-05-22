@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 import {
   FaUtensils,
@@ -59,7 +60,41 @@ const initialCategories: Category[] = [
 ];
 
 const Categories = () => {
-  const [categories] = useState<Category[]>(initialCategories);
+  const [categories,setCategories] = useState<Category[]>(initialCategories);
+  const[incomeExpenseCategory,setIncomeExpenseCategory] = useState({
+    income:0,
+    expense:0
+  })
+
+  useEffect(()=>{
+    async function getCategories(){
+      try{
+        let res = await axios.get("http://localhost:3000/category/getCategories",{
+          withCredentials:true
+        })
+        setCategories(res.data)
+
+        let incomeCat = res.data.filter((item:any)=>item.type ==="income")
+        let expenseCat = res.data.filter((item:any)=>item.type==="expense")
+        console.log(incomeCat,expenseCat)
+        setIncomeExpenseCategory({
+          income:incomeCat.length,
+          expense:expenseCat.length
+
+        })
+
+
+      }catch(err){
+        alert(err)
+      }
+
+    }
+
+    getCategories();
+
+
+
+  },[])
 
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
@@ -87,7 +122,7 @@ const Categories = () => {
           <p className="text-sm text-slate-500">Total Categories</p>
 
           <h1 className="mt-2 text-3xl font-bold text-slate-800">
-            12
+            {categories.length}
           </h1>
         </div>
 
@@ -95,7 +130,7 @@ const Categories = () => {
           <p className="text-sm text-green-700">Income Categories</p>
 
           <h1 className="mt-2 text-3xl font-bold text-green-700">
-            4
+            {incomeExpenseCategory.income}
           </h1>
         </div>
 
@@ -103,7 +138,7 @@ const Categories = () => {
           <p className="text-sm text-red-700">Expense Categories</p>
 
           <h1 className="mt-2 text-3xl font-bold text-red-700">
-            8
+            {incomeExpenseCategory.expense}
           </h1>
         </div>
 
@@ -121,7 +156,9 @@ const Categories = () => {
         {categories.map((category) => (
           <div
             key={category.id}
-            className="group rounded-3xl bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+            
+            className="group rounded-3xl text-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+
           >
             {/* Top Section */}
             <div className="mb-5 flex items-start justify-between">
@@ -131,6 +168,7 @@ const Categories = () => {
                     ? "bg-green-500"
                     : "bg-red-500"
                 }`}
+                style={{backgroundColor:category.color}}
               >
                 {category.icon}
               </div>
