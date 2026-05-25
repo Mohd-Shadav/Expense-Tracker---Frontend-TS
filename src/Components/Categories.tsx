@@ -1,12 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+
 import {
-  FaUtensils,
-  FaPlane,
-  FaBagShopping,
-  FaLaptop,
-  FaMoneyBillTrendUp,
+  // FaUtensils,
+  // FaPlane,
+  // FaBagShopping,
+  // FaLaptop,
+  // FaMoneyBillTrendUp,
   FaPen,
   FaTrash,
   FaPlus,
@@ -14,53 +15,54 @@ import {
 import { Link } from "react-router-dom";
 
 interface Category {
-  id: number;
+  _id: string;
   name: string;
   type: "income" | "expense";
+  color:string,
   description: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
 }
 
-const initialCategories: Category[] = [
-  {
-    id: 1,
-    name: "Food",
-    type: "expense",
-    description: "Daily meals and restaurants",
-    icon: <FaUtensils />,
-  },
-  {
-    id: 2,
-    name: "Travel",
-    type: "expense",
-    description: "Trips and transportation",
-    icon: <FaPlane />,
-  },
-  {
-    id: 3,
-    name: "Shopping",
-    type: "expense",
-    description: "Clothing and accessories",
-    icon: <FaBagShopping />,
-  },
-  {
-    id: 4,
-    name: "Freelance",
-    type: "income",
-    description: "Project based income",
-    icon: <FaLaptop />,
-  },
-  {
-    id: 5,
-    name: "Salary",
-    type: "income",
-    description: "Monthly salary income",
-    icon: <FaMoneyBillTrendUp />,
-  },
-];
+// const initialCategories: Category[] = [
+//   {
+//     id: 1,
+//     name: "Food",
+//     type: "expense",
+//     description: "Daily meals and restaurants",
+//     icon: <FaUtensils />,
+//   },
+//   {
+//     id: 2,
+//     name: "Travel",
+//     type: "expense",
+//     description: "Trips and transportation",
+//     icon: <FaPlane />,
+//   },
+//   {
+//     id: 3,
+//     name: "Shopping",
+//     type: "expense",
+//     description: "Clothing and accessories",
+//     icon: <FaBagShopping />,
+//   },
+//   {
+//     id: 4,
+//     name: "Freelance",
+//     type: "income",
+//     description: "Project based income",
+//     icon: <FaLaptop />,
+//   },
+//   {
+//     id: 5,
+//     name: "Salary",
+//     type: "income",
+//     description: "Monthly salary income",
+//     icon: <FaMoneyBillTrendUp />,
+//   },
+// ];
 
 const Categories = () => {
-  const [categories,setCategories] = useState<Category[]>(initialCategories);
+  const [categories,setCategories] = useState<Category[]>([]);
   const[incomeExpenseCategory,setIncomeExpenseCategory] = useState({
     income:0,
     expense:0
@@ -76,11 +78,10 @@ const Categories = () => {
 
         let incomeCat = res.data.filter((item:any)=>item.type ==="income")
         let expenseCat = res.data.filter((item:any)=>item.type==="expense")
-        console.log(incomeCat,expenseCat)
+        
         setIncomeExpenseCategory({
           income:incomeCat.length,
           expense:expenseCat.length
-
         })
 
 
@@ -95,6 +96,41 @@ const Categories = () => {
 
 
   },[])
+
+  const handleDelete =async (id:string)=>{
+
+   try{
+    let res = await axios.delete("http://localhost:3000/category/deletecategory",{
+      data:{id},
+      withCredentials:true
+    })
+    if(res.status===200){
+      alert("Category Has Been Deleted Successfully")
+      const updatedCategories = categories.filter(
+    (item) => item._id !== id
+  );
+
+  setCategories(updatedCategories);
+
+  const incomeCat = updatedCategories.filter(
+    (item) => item.type === "income"
+  );
+
+  const expenseCat = updatedCategories.filter(
+    (item) => item.type === "expense"
+  );
+
+  setIncomeExpenseCategory({
+    income: incomeCat.length,
+    expense: expenseCat.length
+  });
+    }
+
+   }catch(err){
+    alert(err)
+   }
+
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f7fb] p-6 w-full">
@@ -155,7 +191,7 @@ const Categories = () => {
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {categories.map((category) => (
           <div
-            key={category.id}
+            key={category._id}
             
             className="group rounded-3xl text-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
 
@@ -212,9 +248,9 @@ const Categories = () => {
                   <FaPen size={14} />
                 </button>
 
-                <button className="rounded-xl bg-red-100 p-3 text-red-500 transition-all duration-300 hover:bg-red-200">
+                {/* <button className="rounded-xl bg-red-100 p-3 text-red-500 transition-all duration-300 hover:bg-red-200" onClick={()=>handleDelete(category?._id)}>
                   <FaTrash size={14} />
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
@@ -222,7 +258,7 @@ const Categories = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="mt-8 rounded-3xl bg-white p-6 shadow-sm">
+   { /*  <div className="mt-8 rounded-3xl bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-slate-800">
@@ -238,7 +274,9 @@ const Categories = () => {
             View All Analytics
           </button>
         </div>
-      </div>
+      </div>*/}
+
+      
     </div>
   );
 };
