@@ -144,7 +144,7 @@ const Transactions = () => {
         let res = await axios.put("http://localhost:3000/transaction/updatetransaction",formData,{
           withCredentials:true,
           headers:{
-            "Content-Type":"Application/json"
+            "Content-Type":"application/json"
   
           }
         })
@@ -155,6 +155,9 @@ const Transactions = () => {
   
        if(res.status===200){
         alert("Your Expense Has been updated Successfully.")
+      
+        await getTransactions();
+        
         setOpenModal(false)
         setFormData({
           _id:"",
@@ -252,7 +255,11 @@ const Transactions = () => {
       setOpenModal(true)
       const updateTransaction =  transactionData.filter((item)=> item._id===id)
 
-      console.log(updateTransaction)
+
+      setFormType(updateTransaction[0].type);
+      
+
+      
       setFormData({
       _id:updateTransaction[0]._id,
       title:updateTransaction[0].title,
@@ -271,10 +278,7 @@ const Transactions = () => {
   
   
 
-
-
-  useEffect(()=>{
-    async function getTransactions(){
+ async function getTransactions(){
       try{
         let res = await axios.get("http://localhost:3000/transaction/gettransactions",{
           withCredentials:true
@@ -292,6 +296,9 @@ const Transactions = () => {
       }
 
     }
+
+  useEffect(()=>{
+   
     getTransactions()
 
      async function getCategories(){
